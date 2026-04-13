@@ -1,0 +1,23 @@
+name = "leak-tester"
+main = "src/worker/index.ts"
+compatibility_date = "2024-06-01"
+compatibility_flags = []
+
+routes = [
+  { pattern = "<YOUR_DOMAIN>/*", zone_name = "<YOUR_ZONE>" }
+]
+
+[assets]
+binding = "ASSETS"
+directory = "./dist/client"
+run_worker_first = true
+
+[[kv_namespaces]]
+binding = "LEAK_STORE"
+id = "<REPLACE_ME>"
+preview_id = "<REPLACE_ME>"
+
+[vars]
+ENVIRONMENT = "production"
+CORS_ORIGIN = "https://<YOUR_DOMAIN>"
+# For local dev, create .dev.vars with CORS_ORIGIN=* to allow all origins

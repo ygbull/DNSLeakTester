@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Deployment config
+wrangler.toml
+
+# Project notes & drafts
+docs/plan.md
+docs/frontend.md
+CLAUDE.md
+.claude/
