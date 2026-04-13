@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx vite build
+
+      - name: Generate wrangler.toml
+        env:
+          DEPLOY_DOMAIN: ${{ secrets.DEPLOY_DOMAIN }}
+          ZONE_NAME: ${{ secrets.ZONE_NAME }}
+          KV_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          KV_PREVIEW: ${{ secrets.KV_PREVIEW_ID }}
+        run: |
+          cp wrangler.toml.example wrangler.toml
+          sed -i "s/<YOUR_DOMAIN>/${DEPLOY_DOMAIN}/g" wrangler.toml
+          sed -i "s/<YOUR_ZONE>/${ZONE_NAME}/g" wrangler.toml
+          sed -i "0,/<REPLACE_ME>/{s/<REPLACE_ME>/${KV_ID}/}" wrangler.toml
+          sed -i "0,/<REPLACE_ME>/{s/<REPLACE_ME>/${KV_PREVIEW}/}" wrangler.toml
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy
